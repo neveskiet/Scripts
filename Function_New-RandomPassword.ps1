@@ -1,4 +1,4 @@
-Function New-RandomPassword() {
+function New-RandomPassword() {
 <#
 .SYNOPSIS
     Function to generate a random password
@@ -7,39 +7,44 @@ Function New-RandomPassword() {
 .EXAMPLE
     Generate a random password of 32 characters and store it in the variable
     $password = New-RandomPassword -PasswordLength 32
+.EXAMPLE
+    Generate a random password of 16 characters including special characters
+    $password = New-RandomPassword -PasswordLength 16
+.EXAMPLE
+    Generate a random password of 8 characters from a custom defined string of characters
+    $string = "123abc"
+    $password = New-RandomPassword -PasswordLength 8 -customInputString $string
 #>
-
-    Param(
-        [int]$passwordLength = 16
+    PARAM(
+        [int]$passwordLength = 16,
+        [switch]$includeSpecialCharacters = $false,
+        [string]$customInputString
     )
 
-    Begin {
-        # select ascii characters we want to use in our randomly generated passwords
-        $chars=$null
-        for ($a=48;$a –le 127;$a++) {
-            
-            # Numbers 0 to 9
-            if ($a -in 48..57) {
-                $chars+=,[char][byte]$a
-            }
+    BEGIN
+    {
+        $chars = "ABCDEFGHIJKLMNOPQRSTUVWabcdefghijklmnopqrstuvwxyz1234567890"
+        $specials = "!@#$%^&*(){}[]<>?"
 
-            # Capitals A to Z
-            if ($a -in 65..90) {
-                $chars+=,[char][byte]$a
-            }
+        if($includeSpecialCharacters) {
+            $chars = $chars + $specials
+        }
 
-            # Lowercase a to z
-            if ($a -in 97..122) {
-                $chars+=,[char][byte]$a
-            }
+        if($customInputString) {
+            $chars = $null
+            $chars = $chars + $customInputString
         }
     }
-    Process {
-        For ($i=1; $i –le $passwordLength; $i++) {
-            $password+=($chars | Get-Random)
+    PROCESS
+    {
+        for ($i=1; $i â€“le $passwordLength; $i++) {
+            $n = Get-Random -Maximum ($chars.length)
+            $password += $chars[$n]
         }
+
     }
-    End {
-        return $password
+    END
+    {
+        RETURN $password
     }
-} 
+}
